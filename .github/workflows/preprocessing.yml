@@ -1,0 +1,41 @@
+name: Data Preprocessing Automated Workflow
+
+# Perbaikan syntax trigger: memastikan format terbaca sempurna oleh GitHub
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-preprocess:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository Code
+      uses: actions/checkout@v3
+
+    - name: Set up Python Environment
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Libraries Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas numpy scikit-learn
+
+    - name: Execute Automate Preprocessing Script
+      run: |
+        python preprocessing/automate_Raka.py
+
+    - name: Verify Processed Dataset Output
+      run: |
+        if [ -f "preprocessing/namadataset_preprocessing/credit_score_clean.csv" ]; then
+          echo "Kriteria Advance Sukses Terpenuhi!"
+        else
+          echo "Error: Dataset tidak ditemukan."
+          exit 1
+        fi

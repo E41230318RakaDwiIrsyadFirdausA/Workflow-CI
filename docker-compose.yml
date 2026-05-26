@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # Service untuk menyalakan model serving kamu
+  model-serving:
+    build: ./MLProject
+    container_name: model-serving-raka
+    ports:
+      - "5001:5001"
+    networks:
+      - monitoring-network
+
+  # Service Prometheus kamu (menghubungkan yang sudah ada)
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus-raka
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring-network
+
+  # Service Grafana kamu (menghubungkan yang sudah ada)
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-raka
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring-network
+
+networks:
+  monitoring-network:
+    driver: bridge
