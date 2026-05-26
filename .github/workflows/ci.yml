@@ -21,8 +21,7 @@ jobs:
 
     - name: Install MLflow and Dependencies
       run: |
-        pip install mlflow scikit-learn pandas cloudpickle
-
+        pip install mlflow scikit-learn pandas cloudpickle seaborn
     - name: Run MLflow Project
       run: |
         mlflow run MLProject/ --env-manager=local
