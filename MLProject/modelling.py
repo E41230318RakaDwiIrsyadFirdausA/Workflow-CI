@@ -40,7 +40,7 @@ def run_base_modelling():
     
     
     
-    with mlflow.start_run(run_name="Base_Model_RandomForest_Fixed"):
+    with mlflow.start_run(run_name="Base_Model_RandomForest_Fixed", nested=True):
         n_estimators = 100
         
         # Training Model (Semua parameter, metrik, & folder model otomatis dicatat di sini)
