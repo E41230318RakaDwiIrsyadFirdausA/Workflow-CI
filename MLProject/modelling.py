@@ -38,54 +38,51 @@ def run_base_modelling():
     # =========================================================================
     mlflow.autolog(log_models=True)
     
+    n_estimators = 100
+
+    # Training Model (Semua parameter, metrik, & folder model otomatis dicatat di sini)
+    model = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
+    model.fit(X_train, y_train)
+
+    # Evaluasi Model (SEKARNG SUDAH LURUS SEJAJAR KE KIRI)
+    y_pred = model.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+        
+    # NOTE: Logging manual parameter dan metrik utama DIHAPUS atas saran reviewer
+    # karena sudah di-handle sepenuhnya secara otomatis oleh mlflow.autolog()
     
+    # --- KRITERIA LANJUTAN: Minimal 2 Artefak Kustom (Dipertahankan) ---
+    os.makedirs("temp_outputs", exist_ok=True)
     
-    with mlflow.start_run(run_name="Base_Model_RandomForest_Fixed", nested=True):
-        n_estimators = 100
-        
-        # Training Model (Semua parameter, metrik, & folder model otomatis dicatat di sini)
-        model = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
-        model.fit(X_train, y_train)
-        
-        # Evaluasi Model
-        y_pred = model.predict(X_test)
-        acc = accuracy_score(y_test, y_pred)
-        
-        # NOTE: Logging manual parameter dan metrik utama DIHAPUS atas saran reviewer
-        # karena sudah di-handle sepenuhnya secara otomatis oleh mlflow.autolog()
-        
-        # --- KRITERIA LANJUTAN: Minimal 2 Artefak Kustom (Dipertahankan) ---
-        os.makedirs("temp_outputs", exist_ok=True)
-        
-        # Artefak 1: Ringkasan Laporan Klasifikasi format JSON
-        report_dict = classification_report(y_test, y_pred, output_dict=True)
-        with open("temp_outputs/classification_report.json", "w") as f:
-            json.dump(report_dict, f, indent=4)
-        mlflow.log_artifact("temp_outputs/classification_report.json")
-        
-        # Artefak 2: Plot Grafik Gambar Heatmap Confusion Matrix (.png)
-        plt.figure(figsize=(6, 5))
-        cm = confusion_matrix(y_test, y_pred)
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-        plt.title('Confusion Matrix - Raka Dwi Irsyad')
-        plt.xlabel('Prediksi')
-        plt.ylabel('Aktual')
-        plt.tight_layout()
-        plt.savefig("temp_outputs/confusion_matrix_base.png")
-        plt.close()
-        mlflow.log_artifact("temp_outputs/confusion_matrix_base.png")
-        
-        # 1. Buat folder model lokal di komputer
-        os.makedirs("temp_outputs/model", exist_ok=True)
-        
-        # 2. Simpan model asli ke dalam folder tersebut secara lokal menggunakan MLflow
-        mlflow.sklearn.save_model(model, "temp_outputs/model", serialization_format="cloudpickle")
-        
-        # 3. Paksa upload seluruh folder beserta isinya ke DagsHub
-        mlflow.log_artifact("temp_outputs/model")
-        # =========================================================================
-        
-        print(f"[SUCCESS] Folder model & Autolog berhasil dipaksa masuk ke DagsHub! Akurasi: {acc:.4f}")
+    # Artefak 1: Ringkasan Laporan Klasifikasi format JSON
+    report_dict = classification_report(y_test, y_pred, output_dict=True)
+    with open("temp_outputs/classification_report.json", "w") as f:
+        json.dump(report_dict, f, indent=4)
+    mlflow.log_artifact("temp_outputs/classification_report.json")
+    
+    # Artefak 2: Plot Grafik Gambar Heatmap Confusion Matrix (.png)
+    plt.figure(figsize=(6, 5))
+    cm = confusion_matrix(y_test, y_pred)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.title('Confusion Matrix - Raka Dwi Irsyad')
+    plt.xlabel('Prediksi')
+    plt.ylabel('Aktual')
+    plt.tight_layout()
+    plt.savefig("temp_outputs/confusion_matrix_base.png")
+    plt.close()
+    mlflow.log_artifact("temp_outputs/confusion_matrix_base.png")
+    
+    # 1. Buat folder model lokal di komputer
+    os.makedirs("temp_outputs/model", exist_ok=True)
+    
+    # 2. Simpan model asli ke dalam folder tersebut secara lokal menggunakan MLflow
+    mlflow.sklearn.save_model(model, "temp_outputs/model", serialization_format="cloudpickle")
+    
+    # 3. Paksa upload seluruh folder beserta isinya ke DagsHub
+    mlflow.log_artifact("temp_outputs/model")
+    # =========================================================================
+    
+    print(f"[SUCCESS] Folder model & Autolog berhasil dipaksa masuk ke DagsHub! Akurasi: {acc:.4f}")
 
 if __name__ == "__main__":
     run_base_modelling()
